@@ -1,0 +1,13 @@
+streamlit
+pandas
+catboost
+scikit-learn
+numpy
+openpyxl
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+gdown
+Pillow
+requests
