@@ -313,90 +313,86 @@ else:
     # Interface Streamlit
     st.title("Prédicteur de Tonnage")
 
-    # Créer deux colonnes
-    col1, col2 = st.columns(2)
-    with col1:
 
+    # Entrées utilisateur
+    jour_data = {}
+    jour_mei={}
+    jour_mau={}
+    with st.form("tonnage_prediction_form"):
+        day = st.date_input("Entrez le jour : ")
+        date = pd.to_datetime(day, format='%Y/%m/%d')
+        df['Date'] = pd.to_datetime(df['Date'])
 
-        # Entrées utilisateur
-        jour_data = {}
-        jour_mei={}
-        jour_mau={}
-        with st.form("tonnage_prediction_form"):
-            day = st.date_input("Entrez le jour : ")
-            date = pd.to_datetime(day, format='%Y/%m/%d')
-            df['Date'] = pd.to_datetime(df['Date'])
-
-            # Récupérer la date de la dernière ligne
-            last_date = df['Date'].iloc[-1]
-            jour_data['Jour Férié'] = st.checkbox("Est-ce un jour férié (0/1): ")
-            jour_data['Production Port'] = st.number_input("Entrez la production Port: ")
-            usine=st.number_input("Entrez la production Usine: ")
-            jour_data['Production Total '] = usine + jour_data['Production Port']
-            jour_data["Transfert vers l'U262"] = st.number_input("Entrez le transfert vers l'U262: ")
-            jour_data['stock solide prenable Hangar1'] = st.number_input("Entrez le stock solide prenable Hangar1: ")
-            jour_data['stock solide prenable Hangar2'] = st.number_input("Entrez le stock solide prenable Hangar2: ")
-            h3=st.number_input("Entrez le stock solide prenable Hangar3: ")
-            AL=st.number_input("Entrez le stock solide prenable Air libre: ")
-            jour_data['Total prenable déclaré'] = jour_data['stock solide prenable Hangar1']+jour_data['stock solide prenable Hangar2']+h3+AL
-            jour_data['TRG'] = st.number_input("Entrez le TRG(%): ")
+        # Récupérer la date de la dernière ligne
+        last_date = df['Date'].iloc[-1]
+        jour_data['Jour Férié'] = st.checkbox("Est-ce un jour férié (0/1): ")
+        jour_data['Production Port'] = st.number_input("Entrez la production Port: ")
+        usine=st.number_input("Entrez la production Usine: ")
+        jour_data['Production Total '] = usine + jour_data['Production Port']
+        jour_data["Transfert vers l'U262"] = st.number_input("Entrez le transfert vers l'U262: ")
+        jour_data['stock solide prenable Hangar1'] = st.number_input("Entrez le stock solide prenable Hangar1: ")
+        jour_data['stock solide prenable Hangar2'] = st.number_input("Entrez le stock solide prenable Hangar2: ")
+        h3=st.number_input("Entrez le stock solide prenable Hangar3: ")
+        AL=st.number_input("Entrez le stock solide prenable Air libre: ")
+        jour_data['Total prenable déclaré'] = jour_data['stock solide prenable Hangar1']+jour_data['stock solide prenable Hangar2']+h3+AL
+        jour_data['TRG'] = st.number_input("Entrez le TRG(%): ")
 
 
 
 
-            st.subheader("QUAI 4")
+        st.subheader("QUAI 4")
 
-            jour_data['TONNAGE Humide\nB/L_Q4'] = st.number_input("Enter le tonnage humide du Navire en Q4 (s'il y a deux navires , entrer juste le tonnage du navire entrant): ")
-            jour_data["nombre de navires en décharge_Q4"]=st.number_input("Entrez le nombre de navires en déchargement en Q4:")
-            a=st.text_input("Entrez les navires en déchargement en Quai 4 (s'il n'existe pas, tapez (-), s'il y a plus qu'un entrer navire1+navire2 ): ", "-",key="a")
-            st.markdown('Navire 1')
-            a14 = st.radio("Est-ce que le navire 1 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a14')
-            HD14=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD14")
-            HF14=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF14")
-            st.markdown("Navire 2 (navire entrant)")
-            a24 = st.radio("Est-ce que le navire 2 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a24')
-            HD24=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD24")
-            HF24=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF24")
+        jour_data['TONNAGE Humide\nB/L_Q4'] = st.number_input("Enter le tonnage humide du Navire en Q4 (s'il y a deux navires , entrer juste le tonnage du navire entrant): ")
+        jour_data["nombre de navires en décharge_Q4"]=st.number_input("Entrez le nombre de navires en déchargement en Q4:")
+        a=st.text_input("Entrez les navires en déchargement en Quai 4 (s'il n'existe pas, tapez (-), s'il y a plus qu'un entrer navire1+navire2 ): ", "-",key="a")
+        st.markdown('Navire 1')
+        a14 = st.radio("Est-ce que le navire 1 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a14')
+        HD14=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD14")
+        HF14=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF14")
+        st.markdown("Navire 2 (navire entrant)")
+        a24 = st.radio("Est-ce que le navire 2 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a24')
+        HD24=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD24")
+        HF24=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF24")
 
-            ET4=st.text_input("Entrez l'étape de déchargement en Quai 4 (Finition,Déchargement,Préparation), s'il y a plus qu'une étape, veuillez taper ETAPE1 + ETAPE2 en laissant un espace en les mots , et s'il n' y a pas de navire taper 'Pas de navire': ", 'Pas de navire',key="ET4")
-
-
+        ET4=st.text_input("Entrez l'étape de déchargement en Quai 4 (Finition,Déchargement,Préparation), s'il y a plus qu'une étape, veuillez taper ETAPE1 + ETAPE2 en laissant un espace en les mots , et s'il n' y a pas de navire taper 'Pas de navire': ", 'Pas de navire',key="ET4")
 
 
-            st.subheader("QUAI 5")
 
-            jour_data['TONNAGE Humide\nB/L_Q5'] = st.number_input("Enter le tonnage humide du Navire en Q5 (s'il y a deux navires , entrer juste le tonnage du deuxième navire): ")
-            jour_data["nombre de navires en décharge_Q5"]=st.number_input("Entrez le nombre de navires en déchargement en Q5:")
-            c=st.text_input("Entrez les navires en déchargement en Quai 5 (s'il n'existe pas, tapez (-)), s'il y a plus qu'un entrer navire1+navire2 : ", "-",key="c")
-            st.markdown('Navire 1')
-            a15 = st.radio("Est-ce que le navire 1 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a15')
-            HD15=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD15")
-            HF15=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF15")
-            st.markdown("Navire 2 (navire entrant)")
-            a25 = st.radio("Est-ce que le navire 2 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a25')
-            HD25=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD25")
-            HF25=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF25")
-            ET5=st.text_input("Entrez l'étape de déchargement en Quai 5 (Finition,Déchargement,Préparation), s'il y a plus qu'une étape, veuillez taper ETAPE1 + ETAPE2 en laissant un espace en les mots , et s'il n' y a pas de navire taper 'Pas de navire': ", 'Pas de navire',key="ET5")
+
+        st.subheader("QUAI 5")
+
+        jour_data['TONNAGE Humide\nB/L_Q5'] = st.number_input("Enter le tonnage humide du Navire en Q5 (s'il y a deux navires , entrer juste le tonnage du deuxième navire): ")
+        jour_data["nombre de navires en décharge_Q5"]=st.number_input("Entrez le nombre de navires en déchargement en Q5:")
+        c=st.text_input("Entrez les navires en déchargement en Quai 5 (s'il n'existe pas, tapez (-)), s'il y a plus qu'un entrer navire1+navire2 : ", "-",key="c")
+        st.markdown('Navire 1')
+        a15 = st.radio("Est-ce que le navire 1 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a15')
+        HD15=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD15")
+        HF15=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF15")
+        st.markdown("Navire 2 (navire entrant)")
+        a25 = st.radio("Est-ce que le navire 2 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a25')
+        HD25=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD25")
+        HF25=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF25")
+        ET5=st.text_input("Entrez l'étape de déchargement en Quai 5 (Finition,Déchargement,Préparation), s'il y a plus qu'une étape, veuillez taper ETAPE1 + ETAPE2 en laissant un espace en les mots , et s'il n' y a pas de navire taper 'Pas de navire': ", 'Pas de navire',key="ET5")
 
 
 
 
 
-            st.subheader("QUAI 4 BIS")
+        st.subheader("QUAI 4 BIS")
 
 
-            jour_data['TONNAGE Humide\nB/L_Q4bis'] = st.number_input("Enter le tonnage humide du Navire en Q4 bis (s'il y a deux navires , entrer juste le tonnage du deuxième navire): ")
-            jour_data["nombre de navires en décharge_Q4bis"]=st.number_input("Entrez le nombre de navires en déchargement en Q4 bis:")
-            b=st.text_input("Entrez les navires en déchargement en Quai 4 bis (s'il n'existe pas, tapez (-)): ", "-",key="b")
-            st.markdown('Navire 1')
-            a14bis = st.radio("Est-ce que le navire 1 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a14bis')
-            HD14bis=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD14bis")
-            HF14bis=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF14bis")
-            st.markdown("Navire 2 (navire entrant)")
-            a24bis = st.radio("Est-ce que le navire 2 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a24bis')
-            HD24bis=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD24bis")
-            HF24bis=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF24bis")
-            ET4bis=st.text_input("Entrez l'étape de déchargement en Quai 4 bis (Finition,Déchargement,Préparation), s'il y a plus qu'une étape, veuillez taper ETAPE1 + ETAPE2 en laissant un espace en les mots , et s'il n' y a pas de navire taper 'Pas de navire': ", "Pas de navire",key="ET4bis")
+        jour_data['TONNAGE Humide\nB/L_Q4bis'] = st.number_input("Enter le tonnage humide du Navire en Q4 bis (s'il y a deux navires , entrer juste le tonnage du deuxième navire): ")
+        jour_data["nombre de navires en décharge_Q4bis"]=st.number_input("Entrez le nombre de navires en déchargement en Q4 bis:")
+        b=st.text_input("Entrez les navires en déchargement en Quai 4 bis (s'il n'existe pas, tapez (-)): ", "-",key="b")
+        st.markdown('Navire 1')
+        a14bis = st.radio("Est-ce que le navire 1 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a14bis')
+        HD14bis=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD14bis")
+        HF14bis=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF14bis")
+        st.markdown("Navire 2 (navire entrant)")
+        a24bis = st.radio("Est-ce que le navire 2 vient de commencer aujourd'hui ?", [0, 1], index=0, key='a24bis')
+        HD24bis=st.text_input("Si OUI , ENTRER l'Heure de son début en décharge( sous la forme hh:mm:ss) ': ", "00:00:00",key="HD24bis")
+        HF24bis=st.text_input("S'il termine aujourd'hui  , ENTRER l'Heure de sa fin en décharge( sous la forme hh:mm:ss) ': ", "23:59:59",key="HF24bis")
+        ET4bis=st.text_input("Entrez l'étape de déchargement en Quai 4 bis (Finition,Déchargement,Préparation), s'il y a plus qu'une étape, veuillez taper ETAPE1 + ETAPE2 en laissant un espace en les mots , et s'il n' y a pas de navire taper 'Pas de navire': ", "Pas de navire",key="ET4bis")
 
 
 
@@ -406,35 +402,35 @@ else:
 
 
 
-            st.subheader("ARRÊTS")
+        st.subheader("ARRÊTS")
 
-            quai_4_option = st.radio("Y a-t-il un arrêt en Quai 4:", [0, 1], index=1, key='quai_4_option')
-
-
-
-            jour_data["Arrêts Q4(Durée)"]=st.number_input("Entrez la durée de l'arrêt en Q4 (h):")
-            jour_data["Q4_Nature_OCP"]=0
-            jour_data["Q4_Nature_EXTERNE"]=0
-            jour_data["Q4_Nature_FLS"]=0
-            jour_data["Q4_Nature_TKIS"]=0
-
-
-            quai_5_option = st.radio("Y a-t-il un arrêt en Quai 5:", [0, 1], index=1, key='quai_5_option')
+        quai_4_option = st.radio("Y a-t-il un arrêt en Quai 4:", [0, 1], index=1, key='quai_4_option')
 
 
 
-            jour_data["Arrêts Q5(Durée)"]=st.number_input("Entrez la durée de l'arrêt Q5 (h):")
-            jour_data["Q5_Nature_OCP"]=0
-            jour_data["Q5_Nature_EXTERNE"]=0
-            jour_data["Q5_Nature_FLS"]=0
-            jour_data["Q5_Nature_TKIS"]=0
+        jour_data["Arrêts Q4(Durée)"]=st.number_input("Entrez la durée de l'arrêt en Q4 (h):")
+        jour_data["Q4_Nature_OCP"]=0
+        jour_data["Q4_Nature_EXTERNE"]=0
+        jour_data["Q4_Nature_FLS"]=0
+        jour_data["Q4_Nature_TKIS"]=0
 
 
-            data_jour_avant_Q4=st.number_input(f"Entrer le tonnage déchargé du jour précédent en Q4 [{last_date }]: ")
-            data_jour_avant_Q5=st.number_input(f"Entrer le tonnage déchargé du jour précédent en Q5 [{last_date }]: ")
-            data_jour_avant_Q4bis=st.number_input(f"Entrer le tonnage déchargé du jour précédent en Q4 bis [{last_date }]: ")
+        quai_5_option = st.radio("Y a-t-il un arrêt en Quai 5:", [0, 1], index=1, key='quai_5_option')
 
-            submit_button = st.form_submit_button(label="Soumettre")
+
+
+        jour_data["Arrêts Q5(Durée)"]=st.number_input("Entrez la durée de l'arrêt Q5 (h):")
+        jour_data["Q5_Nature_OCP"]=0
+        jour_data["Q5_Nature_EXTERNE"]=0
+        jour_data["Q5_Nature_FLS"]=0
+        jour_data["Q5_Nature_TKIS"]=0
+
+
+        data_jour_avant_Q4=st.number_input(f"Entrer le tonnage déchargé du jour précédent en Q4 [{last_date }]: ")
+        data_jour_avant_Q5=st.number_input(f"Entrer le tonnage déchargé du jour précédent en Q5 [{last_date }]: ")
+        data_jour_avant_Q4bis=st.number_input(f"Entrer le tonnage déchargé du jour précédent en Q4 bis [{last_date }]: ")
+
+        submit_button = st.form_submit_button(label="Soumettre")
 
 
 
@@ -445,238 +441,237 @@ else:
 
         if submit_button:
 
-            with col2:
-                st.header("Résultats de prédiction")
+            
+            st.header("Résultats de prédiction")
 
 
-                df=remplacer_tonnage(df,day,data_jour_avant_Q4,data_jour_avant_Q5,data_jour_avant_Q4bis)
+            df=remplacer_tonnage(df,day,data_jour_avant_Q4,data_jour_avant_Q5,data_jour_avant_Q4bis)
 
-                baseSS4,baseSS5,baseSS4bis,navire_encoding_dict4,navire_encoding_dict4bis,navire_encoding_dict5,navire_encoding_dict16,navire_encoding_dictET4,navire_encoding_dictET4bis,navire_encoding_dictET5 = correct(df)
-                print(baseSS4)
-
-
-                jour_data['JourSemaine'] = date.weekday()
-                jour_data['JourMois'] = date.day
-                jour_data['Mois'] = date.month
-                jour_data['JourAnnee'] = date.dayofyear
+            baseSS4,baseSS5,baseSS4bis,navire_encoding_dict4,navire_encoding_dict4bis,navire_encoding_dict5,navire_encoding_dict16,navire_encoding_dictET4,navire_encoding_dictET4bis,navire_encoding_dictET5 = correct(df)
+            print(baseSS4)
 
 
-
-
-                jour_data['Navire_Quai_4_encoded'] = navire_encoding_dict4.get(a,-1)
-                jour_data['Navire_Quai_4bis_encoded'] = navire_encoding_dict4bis.get(b,-1)
-                jour_data['Navire_Quai_5_encoded'] = navire_encoding_dict5.get(c,-1)
-                jour_data['Navire_Quai_16_encoded'] = navire_encoding_dict16.get("-")
-                jour_data['Etape_Quai4_enc'] = navire_encoding_dictET4.get(ET4,"Pas de navire")
-                jour_data['Etape_Quai5_enc'] = navire_encoding_dictET5.get(ET5,"Pas de navire")
-                jour_data['Etape_Quai4bis_enc'] = navire_encoding_dictET4bis.get(ET4bis,"Pas de navire")
-
-
-                if jour_data["nombre de navires en décharge_Q4"]==1 and a14==0 and a24==0:
-                    jour_data['TONNAGE Humide\nB/L_Q4']=baseSS4['TONNAGE Humide\nB/L_Q4'].iloc[-1]-data_jour_avant_Q4
-                    jour_data['T0_QUAI4']= duree_en_heures_depuis_minuit(HF14)
-                elif jour_data["nombre de navires en décharge_Q4"]==1 and (a14==1 or a24==1):
-                    jour_data['TONNAGE Humide\nB/L_Q4']=jour_data['TONNAGE Humide\nB/L_Q4']
-                    jour_data['T0_QUAI4']=duree_en_heures_depuis_minuit(HF14)-duree_en_heures_depuis_minuit(HD14)
-                elif jour_data["nombre de navires en décharge_Q4"]==2:
-                    jour_data['TONNAGE Humide\nB/L_Q4']=baseSS4['TONNAGE Humide\nB/L_Q4'].iloc[-1]-data_jour_avant_Q4+jour_data['TONNAGE Humide\nB/L_Q4']
-                    jour_data['T0_QUAI4']=24 - (duree_en_heures_depuis_minuit(HD24)-duree_en_heures_depuis_minuit(HF14))
-                elif jour_data["nombre de navires en décharge_Q4"]==0:
-                    jour_data['T0_QUAI4']=0
-                    jour_data['TONNAGE Humide\nB/L_Q4']=0
-                print(jour_data['T0_QUAI4'])
-                print(jour_data['TONNAGE Humide\nB/L_Q4'])
-
-
-                if jour_data["nombre de navires en décharge_Q5"]==1 and a15==0 and a25==0:
-                    jour_data['TONNAGE Humide\nB/L_Q5']=baseSS5['TONNAGE Humide\nB/L_Q5'].iloc[-1]-data_jour_avant_Q5
-                    jour_data['T0_QUAI5']= duree_en_heures_depuis_minuit(HF15)
-                elif jour_data["nombre de navires en décharge_Q5"]==1 and (a15==1 or a25==1):
-                    jour_data['TONNAGE Humide\nB/L_Q5']=jour_data['TONNAGE Humide\nB/L_Q5']
-                    jour_data['T0_QUAI5']=duree_en_heures_depuis_minuit(HF15)-duree_en_heures_depuis_minuit(HD15)
-                elif jour_data["nombre de navires en décharge_Q5"]==2:
-                    jour_data['TONNAGE Humide\nB/L_Q5']=baseSS5['TONNAGE Humide\nB/L_Q5'].iloc[-1]-data_jour_avant_Q5+jour_data['TONNAGE Humide\nB/L_Q5']
-                    jour_data['T0_QUAI5']=24 - (duree_en_heures_depuis_minuit(HD25)-duree_en_heures_depuis_minuit(HF15))
-                elif jour_data["nombre de navires en décharge_Q5"]==0:
-                    jour_data['T0_QUAI5']=0
-                    jour_data['TONNAGE Humide\nB/L_Q5']=0
-                print(jour_data['T0_QUAI5'])
-                print(jour_data['TONNAGE Humide\nB/L_Q5'])
-
-
-                if jour_data["nombre de navires en décharge_Q4bis"]==1 and a14bis==0 and a24bis==0:
-                    jour_data['TONNAGE Humide\nB/L_Q4bis']=baseSS4bis['TONNAGE Humide\nB/L_Q4bis'].iloc[-1]-data_jour_avant_Q4bis
-                    jour_data['T0_QUAI4bis']= duree_en_heures_depuis_minuit(HF14bis)
-                elif jour_data["nombre de navires en décharge_Q4bis"]==1 and (a14bis==1 or a24bis==1):
-                    jour_data['TONNAGE Humide\nB/L_Q4bis']=jour_data['TONNAGE Humide\nB/L_Q4bis']
-                    jour_data['T0_QUAI4bis']=duree_en_heures_depuis_minuit(HF14bis)-duree_en_heures_depuis_minuit(HD14bis)
-                elif jour_data["nombre de navires en décharge_Q4bis"]==2:
-                    jour_data['TONNAGE Humide\nB/L_Q4bis']=baseSS4bis['TONNAGE Humide\nB/L_Q4bis'].iloc[-1]-data_jour_avant_Q4bis+jour_data['TONNAGE Humide\nB/L_Q4bis']
-                    jour_data['T0_QUAI4bis']=24 - (duree_en_heures_depuis_minuit(HD24bis)-duree_en_heures_depuis_minuit(HF14bis))
-                elif jour_data["nombre de navires en décharge_Q4bis"]==0:
-                    jour_data['T0_QUAI4bis']=0
-                    jour_data['TONNAGE Humide\nB/L_Q4bis']=0
-                print(jour_data['T0_QUAI4bis'])
-                print(jour_data['TONNAGE Humide\nB/L_Q4bis'])
-
-
-                df=remlissage(jour_data,day,a,b,c,ET4,ET5,ET4bis,df,output)
-
-
-                jour_data4=jour_data.copy()
-                jour_data5=jour_data.copy()
-                jour_data4bis=jour_data.copy()
+            jour_data['JourSemaine'] = date.weekday()
+            jour_data['JourMois'] = date.day
+            jour_data['Mois'] = date.month
+            jour_data['JourAnnee'] = date.dayofyear
 
 
 
 
-                jour_info4 = pd.DataFrame([jour_data4])
-                jour_info5 = pd.DataFrame([jour_data5])
-                jour_info4bis = pd.DataFrame([jour_data4bis])
-
-                jour_mei4=jour_data4.copy()
-                jour_mei4["Arrêts Q4(Durée)"]=0
-                jour_mei4["TRG"]=100
-                jour_me4 = pd.DataFrame([jour_mei4])
-
-                jour_mei5=jour_data5.copy()
-                jour_mei5["Arrêts Q5(Durée)"]=0
-                jour_mei5["TRG"]=100
-                jour_me5 = pd.DataFrame([jour_mei5])
-
-                jour_mau4=jour_data4.copy()
-                jour_mau4["Arrêts Q4(Durée)"]=238
-                jour_mau4["TRG"]=1.5
-                jour_ma4 = pd.DataFrame([jour_mau4])
-
-                jour_mau5=jour_data5.copy()
-                jour_mau5["Arrêts Q5(Durée)"]=238
-                jour_mau5["TRG"]=1.5
-                jour_ma5 = pd.DataFrame([jour_mau5])
-
-                # Préparer les données pour l'entraînement du modèle
-                X4_days = baseSS4.drop(columns=['décharge Quai 4','décharge Quai 4 bis','décharge Quai 5'])
-                X4bis_days = baseSS4bis.drop(columns=['décharge Quai 4','décharge Quai 4 bis','décharge Quai 5'])
-                X5_days = baseSS5.drop(columns=['décharge Quai 4','décharge Quai 4 bis','décharge Quai 5'])
-                y4_days = baseSS4['décharge Quai 4']
-                y4bis_days = baseSS4bis['décharge Quai 4 bis']
-                y5_days = baseSS5['décharge Quai 5']
-                y4_days = y4_days.astype(int)
-                y4bis_days = y4bis_days.astype(int)
-                y5_days = y5_days.astype(int)
-                print(y4_days)
-                print(y4bis_days)
-                print(y5_days)
-                model_days4 = CatBoostRegressor(iterations=1000, learning_rate=0.1, depth=6, verbose=100)
-                model_days4bis = CatBoostRegressor(iterations=1000, learning_rate=0.1, depth=6, verbose=100)
-                model_days5 = CatBoostRegressor(iterations=1000, learning_rate=0.1, depth=6, verbose=100)
-                model_days4.fit(X4_days, y4_days)
-                model_days4bis.fit(X4bis_days, y4bis_days)
-                model_days5.fit(X5_days, y5_days)
-                # Créer un Pool pour l'ensemble complet
+            jour_data['Navire_Quai_4_encoded'] = navire_encoding_dict4.get(a,-1)
+            jour_data['Navire_Quai_4bis_encoded'] = navire_encoding_dict4bis.get(b,-1)
+            jour_data['Navire_Quai_5_encoded'] = navire_encoding_dict5.get(c,-1)
+            jour_data['Navire_Quai_16_encoded'] = navire_encoding_dict16.get("-")
+            jour_data['Etape_Quai4_enc'] = navire_encoding_dictET4.get(ET4,"Pas de navire")
+            jour_data['Etape_Quai5_enc'] = navire_encoding_dictET5.get(ET5,"Pas de navire")
+            jour_data['Etape_Quai4bis_enc'] = navire_encoding_dictET4bis.get(ET4bis,"Pas de navire")
 
 
-                full_pool4 = Pool(data=X4_days)
-                full_pool4bis = Pool(data=X4bis_days)
-                full_pool5 = Pool(data=X5_days)
-                # Prédire sur l'ensemble complet
-                baseSS4['Tonnage_Humide_Predit_Q4'] = model_days4.predict(full_pool4)
-                baseSS4bis['Tonnage_Humide_Predit_Q4bis'] = model_days4bis.predict(full_pool4bis)
-                baseSS5['Tonnage_Humide_Predit_Q5'] = model_days5.predict(full_pool5)
-                for i in range(len(baseSS4)):
-                    if baseSS4['Tonnage_Humide_Predit_Q4'][i]<0:
-                        baseSS4['Tonnage_Humide_Predit_Q4'][i]=0
-                    elif baseSS5['Tonnage_Humide_Predit_Q5'][i]<0:
-                        baseSS5['Tonnage_Humide_Predit_Q5'][i]=0
-                    elif baseSS4bis['Tonnage_Humide_Predit_Q4bis'][i]<0:
-                        baseSS4bis['Tonnage_Humide_Predit_Q4bis'][i]=0
-                print(baseSS4['décharge Quai 4'])
-                print(baseSS4bis['décharge Quai 4 bis'])
-                print(baseSS5['décharge Quai 5'])
+            if jour_data["nombre de navires en décharge_Q4"]==1 and a14==0 and a24==0:
+                jour_data['TONNAGE Humide\nB/L_Q4']=baseSS4['TONNAGE Humide\nB/L_Q4'].iloc[-1]-data_jour_avant_Q4
+                jour_data['T0_QUAI4']= duree_en_heures_depuis_minuit(HF14)
+            elif jour_data["nombre de navires en décharge_Q4"]==1 and (a14==1 or a24==1):
+                jour_data['TONNAGE Humide\nB/L_Q4']=jour_data['TONNAGE Humide\nB/L_Q4']
+                jour_data['T0_QUAI4']=duree_en_heures_depuis_minuit(HF14)-duree_en_heures_depuis_minuit(HD14)
+            elif jour_data["nombre de navires en décharge_Q4"]==2:
+                jour_data['TONNAGE Humide\nB/L_Q4']=baseSS4['TONNAGE Humide\nB/L_Q4'].iloc[-1]-data_jour_avant_Q4+jour_data['TONNAGE Humide\nB/L_Q4']
+                jour_data['T0_QUAI4']=24 - (duree_en_heures_depuis_minuit(HD24)-duree_en_heures_depuis_minuit(HF14))
+            elif jour_data["nombre de navires en décharge_Q4"]==0:
+                jour_data['T0_QUAI4']=0
+                jour_data['TONNAGE Humide\nB/L_Q4']=0
+            print(jour_data['T0_QUAI4'])
+            print(jour_data['TONNAGE Humide\nB/L_Q4'])
 
 
-                # Filtrer les jours où le tonnage humide réel est différent de zéro
-                baseSS_non_zero4 = baseSS4[baseSS4['décharge Quai 4'] != 0]
-                baseSS_non_zero4bis = baseSS4bis[baseSS4bis['décharge Quai 4 bis'] != 0]
-                baseSS_non_zero5 = baseSS5[baseSS5['décharge Quai 5'] != 0]
+            if jour_data["nombre de navires en décharge_Q5"]==1 and a15==0 and a25==0:
+                jour_data['TONNAGE Humide\nB/L_Q5']=baseSS5['TONNAGE Humide\nB/L_Q5'].iloc[-1]-data_jour_avant_Q5
+                jour_data['T0_QUAI5']= duree_en_heures_depuis_minuit(HF15)
+            elif jour_data["nombre de navires en décharge_Q5"]==1 and (a15==1 or a25==1):
+                jour_data['TONNAGE Humide\nB/L_Q5']=jour_data['TONNAGE Humide\nB/L_Q5']
+                jour_data['T0_QUAI5']=duree_en_heures_depuis_minuit(HF15)-duree_en_heures_depuis_minuit(HD15)
+            elif jour_data["nombre de navires en décharge_Q5"]==2:
+                jour_data['TONNAGE Humide\nB/L_Q5']=baseSS5['TONNAGE Humide\nB/L_Q5'].iloc[-1]-data_jour_avant_Q5+jour_data['TONNAGE Humide\nB/L_Q5']
+                jour_data['T0_QUAI5']=24 - (duree_en_heures_depuis_minuit(HD25)-duree_en_heures_depuis_minuit(HF15))
+            elif jour_data["nombre de navires en décharge_Q5"]==0:
+                jour_data['T0_QUAI5']=0
+                jour_data['TONNAGE Humide\nB/L_Q5']=0
+            print(jour_data['T0_QUAI5'])
+            print(jour_data['TONNAGE Humide\nB/L_Q5'])
 
-                # Calculer l'erreur relative en pourcentage
-                erreur_relative4 = ((baseSS_non_zero4['Tonnage_Humide_Predit_Q4'] - baseSS_non_zero4['décharge Quai 4']) / baseSS_non_zero4['décharge Quai 4']) * 100
-                erreur_relative4bis = ((baseSS_non_zero4bis['Tonnage_Humide_Predit_Q4bis'] - baseSS_non_zero4bis['décharge Quai 4 bis']) / baseSS_non_zero4bis['décharge Quai 4 bis']) * 100
-                erreur_relative5 = ((baseSS_non_zero5['Tonnage_Humide_Predit_Q5'] - baseSS_non_zero5['décharge Quai 5']) / baseSS_non_zero5['décharge Quai 5']) * 100
 
-                # Calculer le RMSE en pourcentage
-                rmse_pourcentage4 = np.sqrt(np.mean(erreur_relative4 ** 2))
-                rmse_pourcentage4bis = np.sqrt(np.mean(erreur_relative4bis ** 2))
-                rmse_pourcentage5 = np.sqrt(np.mean(erreur_relative5 ** 2))
+            if jour_data["nombre de navires en décharge_Q4bis"]==1 and a14bis==0 and a24bis==0:
+                jour_data['TONNAGE Humide\nB/L_Q4bis']=baseSS4bis['TONNAGE Humide\nB/L_Q4bis'].iloc[-1]-data_jour_avant_Q4bis
+                jour_data['T0_QUAI4bis']= duree_en_heures_depuis_minuit(HF14bis)
+            elif jour_data["nombre de navires en décharge_Q4bis"]==1 and (a14bis==1 or a24bis==1):
+                jour_data['TONNAGE Humide\nB/L_Q4bis']=jour_data['TONNAGE Humide\nB/L_Q4bis']
+                jour_data['T0_QUAI4bis']=duree_en_heures_depuis_minuit(HF14bis)-duree_en_heures_depuis_minuit(HD14bis)
+            elif jour_data["nombre de navires en décharge_Q4bis"]==2:
+                jour_data['TONNAGE Humide\nB/L_Q4bis']=baseSS4bis['TONNAGE Humide\nB/L_Q4bis'].iloc[-1]-data_jour_avant_Q4bis+jour_data['TONNAGE Humide\nB/L_Q4bis']
+                jour_data['T0_QUAI4bis']=24 - (duree_en_heures_depuis_minuit(HD24bis)-duree_en_heures_depuis_minuit(HF14bis))
+            elif jour_data["nombre de navires en décharge_Q4bis"]==0:
+                jour_data['T0_QUAI4bis']=0
+                jour_data['TONNAGE Humide\nB/L_Q4bis']=0
+            print(jour_data['T0_QUAI4bis'])
+            print(jour_data['TONNAGE Humide\nB/L_Q4bis'])
 
-                # Prédire avec le modèle
-                predicted_tonnage4 = model_days4.predict(jour_info4)
-                predicted_tonnage14 = model_days4.predict(jour_me4)
-                predicted_tonnage24 = model_days4.predict(jour_ma4)
-                print(jour_mau4)
-                print(jour_data4)
-                predicted_tonnage4bis = model_days4bis.predict(jour_info4bis)
-                print(jour_data4bis)
-                predicted_tonnage5 = model_days5.predict(jour_info5)
-                predicted_tonnage15 = model_days5.predict(jour_me5)
-                predicted_tonnage25 = model_days5.predict(jour_ma5)
-                print(jour_mau5)
-                print(jour_data5)
-                if predicted_tonnage4[0]<0:
-                    predicted_tonnage4[0]=0
-                elif predicted_tonnage5[0]<0:
-                    predicted_tonnage5[0]=0
-                elif predicted_tonnage4bis[0]<0:
-                    predicted_tonnage4bis[0]=0
-                elif predicted_tonnage14[0]<0:
-                    predicted_tonnage14[0]=0
-                elif predicted_tonnage24[0]<0:
-                    predicted_tonnage24[0]=0
-                elif predicted_tonnage15[0]<0:
-                    predicted_tonnage15[0]=0
-                elif predicted_tonnage25[0]<0:
-                    predicted_tonnage25[0]=0
 
-                # Créer deux colonnes
-                col3, col4 = st.columns(2)
-                # Afficher la première sortie dans la colonne de gauche
-                with col3:
-                    # Créer une liste vide pour stocker les lignes du tableau
-                    resultats = []
+            df=remlissage(jour_data,day,a,b,c,ET4,ET5,ET4bis,df,output)
 
-                    # Ajouter conditionnellement des lignes pour chaque quai en fonction de `jour_data`
-                    if jour_data["nombre de navires en décharge_Q4"] != 0:
-                        resultats.append({
-                            "Quai": "Q4",
-                            "Tonnage prédit": f"{predicted_tonnage4[0]:.2f}",
-                            "Meilleures conditions": f"{predicted_tonnage14[0]:.2f}",
-                            "Mauvaises conditions": f"{predicted_tonnage24[0]:.2f}",
-                            "Erreur (RMSE%)": f"{rmse_pourcentage4:.2f}%"
-                        })
 
-                    if jour_data["nombre de navires en décharge_Q4bis"] != 0:
-                        resultats.append({
-                            "Quai": "Q4bis",
-                            "Tonnage prédit": f"{predicted_tonnage4bis[0]:.2f}",
-                            "Meilleures conditions": "N/A",  # Ajuster si nécessaire
-                            "Mauvaises conditions": "N/A",
-                            "Erreur (RMSE%)": f"{rmse_pourcentage4bis:.2f}%"
-                        })
+            jour_data4=jour_data.copy()
+            jour_data5=jour_data.copy()
+            jour_data4bis=jour_data.copy()
 
-                    if jour_data["nombre de navires en décharge_Q5"] != 0:
-                        resultats.append({
-                            "Quai": "Q5",
-                            "Tonnage prédit": f"{predicted_tonnage5[0]:.2f}",
-                            "Meilleures conditions": f"{predicted_tonnage15[0]:.2f}",
-                            "Mauvaises conditions": f"{predicted_tonnage25[0]:.2f}",
-                            "Erreur (RMSE%)": f"{rmse_pourcentage5:.2f}%"
-                        })
 
-                    # Convertir la liste `resultats` en DataFrame pour l'affichage
-                    resultats_df = pd.DataFrame(resultats)
 
-                    # Afficher le DataFrame sous forme de tableau
-                    st.header("Résultats de prédiction")
-                    st.table(resultats_df)
+
+            jour_info4 = pd.DataFrame([jour_data4])
+            jour_info5 = pd.DataFrame([jour_data5])
+            jour_info4bis = pd.DataFrame([jour_data4bis])
+
+            jour_mei4=jour_data4.copy()
+            jour_mei4["Arrêts Q4(Durée)"]=0
+            jour_mei4["TRG"]=100
+            jour_me4 = pd.DataFrame([jour_mei4])
+
+            jour_mei5=jour_data5.copy()
+            jour_mei5["Arrêts Q5(Durée)"]=0
+            jour_mei5["TRG"]=100
+            jour_me5 = pd.DataFrame([jour_mei5])
+
+            jour_mau4=jour_data4.copy()
+            jour_mau4["Arrêts Q4(Durée)"]=238
+            jour_mau4["TRG"]=1.5
+            jour_ma4 = pd.DataFrame([jour_mau4])
+
+            jour_mau5=jour_data5.copy()
+            jour_mau5["Arrêts Q5(Durée)"]=238
+            jour_mau5["TRG"]=1.5
+            jour_ma5 = pd.DataFrame([jour_mau5])
+
+            # Préparer les données pour l'entraînement du modèle
+            X4_days = baseSS4.drop(columns=['décharge Quai 4','décharge Quai 4 bis','décharge Quai 5'])
+            X4bis_days = baseSS4bis.drop(columns=['décharge Quai 4','décharge Quai 4 bis','décharge Quai 5'])
+            X5_days = baseSS5.drop(columns=['décharge Quai 4','décharge Quai 4 bis','décharge Quai 5'])
+            y4_days = baseSS4['décharge Quai 4']
+            y4bis_days = baseSS4bis['décharge Quai 4 bis']
+            y5_days = baseSS5['décharge Quai 5']
+            y4_days = y4_days.astype(int)
+            y4bis_days = y4bis_days.astype(int)
+            y5_days = y5_days.astype(int)
+            print(y4_days)
+            print(y4bis_days)
+            print(y5_days)
+            model_days4 = CatBoostRegressor(iterations=1000, learning_rate=0.1, depth=6, verbose=100)
+            model_days4bis = CatBoostRegressor(iterations=1000, learning_rate=0.1, depth=6, verbose=100)
+            model_days5 = CatBoostRegressor(iterations=1000, learning_rate=0.1, depth=6, verbose=100)
+            model_days4.fit(X4_days, y4_days)
+            model_days4bis.fit(X4bis_days, y4bis_days)
+            model_days5.fit(X5_days, y5_days)
+            # Créer un Pool pour l'ensemble complet
+
+
+            full_pool4 = Pool(data=X4_days)
+            full_pool4bis = Pool(data=X4bis_days)
+            full_pool5 = Pool(data=X5_days)
+            # Prédire sur l'ensemble complet
+            baseSS4['Tonnage_Humide_Predit_Q4'] = model_days4.predict(full_pool4)
+            baseSS4bis['Tonnage_Humide_Predit_Q4bis'] = model_days4bis.predict(full_pool4bis)
+            baseSS5['Tonnage_Humide_Predit_Q5'] = model_days5.predict(full_pool5)
+            for i in range(len(baseSS4)):
+                if baseSS4['Tonnage_Humide_Predit_Q4'][i]<0:
+                    baseSS4['Tonnage_Humide_Predit_Q4'][i]=0
+                elif baseSS5['Tonnage_Humide_Predit_Q5'][i]<0:
+                    baseSS5['Tonnage_Humide_Predit_Q5'][i]=0
+                elif baseSS4bis['Tonnage_Humide_Predit_Q4bis'][i]<0:
+                    baseSS4bis['Tonnage_Humide_Predit_Q4bis'][i]=0
+            print(baseSS4['décharge Quai 4'])
+            print(baseSS4bis['décharge Quai 4 bis'])
+            print(baseSS5['décharge Quai 5'])
+
+
+            # Filtrer les jours où le tonnage humide réel est différent de zéro
+            baseSS_non_zero4 = baseSS4[baseSS4['décharge Quai 4'] != 0]
+            baseSS_non_zero4bis = baseSS4bis[baseSS4bis['décharge Quai 4 bis'] != 0]
+            baseSS_non_zero5 = baseSS5[baseSS5['décharge Quai 5'] != 0]
+
+            # Calculer l'erreur relative en pourcentage
+            erreur_relative4 = ((baseSS_non_zero4['Tonnage_Humide_Predit_Q4'] - baseSS_non_zero4['décharge Quai 4']) / baseSS_non_zero4['décharge Quai 4']) * 100
+            erreur_relative4bis = ((baseSS_non_zero4bis['Tonnage_Humide_Predit_Q4bis'] - baseSS_non_zero4bis['décharge Quai 4 bis']) / baseSS_non_zero4bis['décharge Quai 4 bis']) * 100
+            erreur_relative5 = ((baseSS_non_zero5['Tonnage_Humide_Predit_Q5'] - baseSS_non_zero5['décharge Quai 5']) / baseSS_non_zero5['décharge Quai 5']) * 100
+
+            # Calculer le RMSE en pourcentage
+            rmse_pourcentage4 = np.sqrt(np.mean(erreur_relative4 ** 2))
+            rmse_pourcentage4bis = np.sqrt(np.mean(erreur_relative4bis ** 2))
+            rmse_pourcentage5 = np.sqrt(np.mean(erreur_relative5 ** 2))
+
+            # Prédire avec le modèle
+            predicted_tonnage4 = model_days4.predict(jour_info4)
+            predicted_tonnage14 = model_days4.predict(jour_me4)
+            predicted_tonnage24 = model_days4.predict(jour_ma4)
+            print(jour_mau4)
+            print(jour_data4)
+            predicted_tonnage4bis = model_days4bis.predict(jour_info4bis)
+            print(jour_data4bis)
+            predicted_tonnage5 = model_days5.predict(jour_info5)
+            predicted_tonnage15 = model_days5.predict(jour_me5)
+            predicted_tonnage25 = model_days5.predict(jour_ma5)
+            print(jour_mau5)
+            print(jour_data5)
+            if predicted_tonnage4[0]<0:
+                predicted_tonnage4[0]=0
+            elif predicted_tonnage5[0]<0:
+                predicted_tonnage5[0]=0
+            elif predicted_tonnage4bis[0]<0:
+                predicted_tonnage4bis[0]=0
+            elif predicted_tonnage14[0]<0:
+                predicted_tonnage14[0]=0
+            elif predicted_tonnage24[0]<0:
+                predicted_tonnage24[0]=0
+            elif predicted_tonnage15[0]<0:
+                predicted_tonnage15[0]=0
+            elif predicted_tonnage25[0]<0:
+                predicted_tonnage25[0]=0
+
+            # Créer deux colonnes
+            col3, col4 = st.columns(2)
+            # Afficher la première sortie dans la colonne de gauche
+            with col3:
+                # Créer une liste vide pour stocker les lignes du tableau
+                resultats = []
+
+                # Ajouter conditionnellement des lignes pour chaque quai en fonction de `jour_data`
+                if jour_data["nombre de navires en décharge_Q4"] != 0:
+                    resultats.append({
+                        "Quai": "Q4",
+                        "Tonnage prédit": f"{predicted_tonnage4[0]:.2f}",
+                        "Meilleures conditions": f"{predicted_tonnage14[0]:.2f}",
+                        "Mauvaises conditions": f"{predicted_tonnage24[0]:.2f}",
+                        "Erreur (RMSE%)": f"{rmse_pourcentage4:.2f}%"
+                    })
+
+                if jour_data["nombre de navires en décharge_Q4bis"] != 0:
+                    resultats.append({
+                        "Quai": "Q4bis",
+                        "Tonnage prédit": f"{predicted_tonnage4bis[0]:.2f}",
+                        "Meilleures conditions": "N/A",  # Ajuster si nécessaire
+                        "Mauvaises conditions": "N/A",
+                        "Erreur (RMSE%)": f"{rmse_pourcentage4bis:.2f}%"
+                    })
+
+                if jour_data["nombre de navires en décharge_Q5"] != 0:
+                    resultats.append({
+                        "Quai": "Q5",
+                        "Tonnage prédit": f"{predicted_tonnage5[0]:.2f}",
+                        "Meilleures conditions": f"{predicted_tonnage15[0]:.2f}",
+                        "Mauvaises conditions": f"{predicted_tonnage25[0]:.2f}",
+                        "Erreur (RMSE%)": f"{rmse_pourcentage5:.2f}%"
+                    })
+
+                # Convertir la liste `resultats` en DataFrame pour l'affichage
+                resultats_df = pd.DataFrame(resultats)
+
+                # Afficher le DataFrame sous forme de tableau
+                st.table(resultats_df)
 
