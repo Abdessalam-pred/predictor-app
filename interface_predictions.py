@@ -14,6 +14,7 @@ from PIL import Image
 import streamlit.components.v1 as components
 import base64
 import requests
+import json
 
 
 # Remplacez FILE_ID par l'ID de votre fichier sur Google Drive
@@ -287,11 +288,17 @@ else:
         new_row = new_row[df1.columns]
         df1 = pd.concat([df1, new_row], ignore_index=True)
         df1.to_excel(output, index=False, engine='openpyxl')
+        
+        # Récupérer la clé JSON Base64 stockée dans les secrets Streamlit
+        json_base64 = st.secrets["GOOGLE_CREDENTIALS"]
+        # Décoder la chaîne Base64
+        json_data = base64.b64decode(json_base64)
+        # Charger les données JSON en tant que dictionnaire
+        credentials_info = json.loads(json_data)
 
         SCOPES = ['https://www.googleapis.com/auth/drive']
-        SERVICE_ACCOUNT_FILE = '/Users/abdessalamabdessalam/Desktop/ocp stage/base/sacred-particle-433712-t1-3f049e71199f.json'
-        credentials = service_account.Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        # Créer les identifiants à partir des données JSON décodées
+        credentials = service_account.Credentials.from_service_account_info(credentials_info, scopes=SCOPES)
 
         service = build('drive', 'v3', credentials=credentials)
         media = MediaFileUpload(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
