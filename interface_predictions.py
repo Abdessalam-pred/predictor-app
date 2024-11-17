@@ -673,5 +673,27 @@ else:
                 resultats_df = pd.DataFrame(resultats)
 
                 # Afficher le DataFrame sous forme de tableau
+                # Injecter du CSS pour personnaliser les tableaux
+                st.markdown(
+                    """
+                    <style>
+                        table {
+                            background-color: black;
+                            color: white;
+                            border: 1px solid white;
+                            width: 100%;
+                        }
+                        table th, table td {
+                            text-align: center;
+                            padding: 10px;
+                            border: 1px solid white;
+                        }
+                        table th {
+                            background-color: #444;
+                        }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
                 st.table(resultats_df)
 
