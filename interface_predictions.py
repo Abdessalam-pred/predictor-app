@@ -15,6 +15,7 @@ import streamlit.components.v1 as components
 import base64
 import requests
 import json
+import os
 
 
 # Remplacez FILE_ID par l'ID de votre fichier sur Google Drive
