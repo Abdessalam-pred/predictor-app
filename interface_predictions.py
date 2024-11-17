@@ -289,17 +289,14 @@ else:
         df1 = pd.concat([df1, new_row], ignore_index=True)
         df1.to_excel(output, index=False, engine='openpyxl')
         
-        # Récupérer la clé JSON Base64 stockée dans les secrets Streamlit
-        json_base64 = st.secrets["GOOGLE_CREDENTIALS"]
-        # Décoder la chaîne Base64
-        json_data = base64.b64decode(json_base64)
-        # Charger les données JSON en tant que dictionnaire
-        credentials_info = json.loads(json_data)
+        
 
         SCOPES = ['https://www.googleapis.com/auth/drive']
-        # Créer les identifiants à partir des données JSON décodées
-        credentials = service_account.Credentials.from_service_account_info(credentials_info, scopes=SCOPES)
-
+        # Charger les informations d'identification depuis les secrets
+        credentials_json = os.environ.get("GOOGLE_CREDENTIALS")
+        credentials_dict = json.loads(base64.b64decode(credentials_json))
+        
+        credentials = service_account.Credentials.from_service_account_info(credentials_dict)
         service = build('drive', 'v3', credentials=credentials)
         media = MediaFileUpload(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
